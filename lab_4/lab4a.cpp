@@ -4,17 +4,16 @@
 #include <fstream>
 #include <functional>
 #include <algorithm>
-using namespace std;
 
 struct Employee {
-    string name;
-    string birthYear;
-    string profession;
-    string structure;
+    std::string name;
+    std::string birthYear;
+    std::string profession;
+    std::string structure;
 };
 
-auto split = [](string baseString, const string separator) {
-    vector<string> splittedValue;
+auto split = [](std::string& baseString, const std::string& separator) {
+    std::vector<std::string> splittedValue;
     baseString += separator;
     while (!baseString.empty()) {
         auto index = baseString.find(separator);
@@ -24,30 +23,30 @@ auto split = [](string baseString, const string separator) {
     return splittedValue;
 };
 
-auto sortAscendingByBirthYear = [](Employee e1, Employee e2) {
+auto sortAscendingByBirthYear = [](const Employee& e1, Employee& e2) {
     return e1.birthYear < e2.birthYear;
 };
 
-auto isEngeneer = [](Employee e) {
+auto isEngeneer = [](const Employee& e) {
     return e.profession == "engineer";
 };
 
-auto isNotChairman = [](Employee e) {
+auto isNotChairman = [](const Employee& e) {
     return e.profession != "chairman";
 };
 
 class BD {
 private:
-    vector<Employee> employees;
-    string fileName;
+    std::vector<Employee> employees;
+    std::string fileName;
 
-    vector<Employee> getSorted(vector<Employee> arr, function<bool(Employee, Employee)> sortFunction) {
+    std::vector<Employee> getSorted(std::vector<Employee> arr, std::function<bool(Employee, Employee)> sortFunction) {
         auto a = arr;
         sort(a.begin(), a.end(), sortFunction);
         return a;
     }
 
-    vector<Employee> getWithExpetions(vector<Employee> arr, const vector<function<bool(Employee)> > exeptions) {
+    std::vector<Employee> getWithExpetions(std::vector<Employee> arr, const std::vector<std::function<bool(Employee)> > exeptions) {
         auto a = arr;
         a.erase(remove_if(a.begin(), a.end(), [&](const Employee &e) {
             for (auto &ex: exeptions) if (!ex(e)) return true;
@@ -56,43 +55,43 @@ private:
         return a;
     }
 
-    void display(vector<Employee> arr) {
+    void display(std::vector<Employee>& arr) {
         for (auto employee: arr) {
-            cout << "Employee: " << endl;
-            cout << '\t' << employee.name << endl;
-            cout << '\t' << employee.birthYear << endl;
-            cout << '\t' << employee.profession << endl;
-            cout << '\t' << employee.structure << endl;
+            std::cout << "Employee: " << "\n";
+            std::cout << '\t' << employee.name << "\n";
+            std::cout << '\t' << employee.birthYear << "\n";
+            std::cout << '\t' << employee.profession << "\n";
+            std::cout << '\t' << employee.structure << "\n";
         }
     }
 
 public:
-    BD(string fName) {
+    BD(const std::string& fName) {
         fileName = fName;
         loadFile();
     };
 
     void loadFile() {
-        ifstream file(fileName);
+        std::ifstream file(fileName);
         if (!file.is_open()) return;
         employees.clear();
-        string line;
-        while (getline(file, line)) {
+        std::string line;
+        while (std::getline(file, line)) {
             auto employeeData = split(line, ", ");
             if (employeeData.size() < 4) continue;
             employees.push_back(Employee{employeeData[0], employeeData[1], employeeData[2], employeeData[3]});
         }
     };
 
-    void display(function<bool(Employee, Employee)> sortFunction, vector<function<bool(Employee)> > exeptions) {
+    void display(std::function<bool(Employee, Employee)> sortFunction, std::vector<std::function<bool(Employee)> > exeptions) {
         display(getSorted(getWithExpetions(employees, exeptions), sortFunction));
     }
 
-    void display(vector<function<bool(Employee)> > exeptions) {
+    void display(std::vector<std::function<bool(Employee)> > exeptions) {
         display(getWithExpetions(employees, exeptions));
     }
 
-    void display(function<bool(Employee, Employee)> sortFunction) {
+    void display(std::function<bool(Employee, Employee)> sortFunction) {
         display(getSorted(employees, sortFunction));
     }
 
@@ -101,10 +100,10 @@ public:
 
 int main() {
     BD db("data.txt");
-    cout << "Engeneers: \n";
+    std::cout << "Engeneers: \n";
     db.display({isEngeneer});
 
-    cout << "\nNot chairmans with ascending sort: \n";
+    std::cout << "\nNot chairmans with ascending sort: \n";
     db.display(sortAscendingByBirthYear, {isNotChairman});
     return 0;
 }
